@@ -9,6 +9,9 @@ const ProjectSchema = require('../models/Project');
 const fetchuser = require('../middleware/fetchuser');
 const { v4: uuidv4 } = require('uuid');
 const dotenv = require('dotenv').config();
+const pool = require('../pgdb');
+const AWS = require('aws-sdk');
+const fs = require('fs');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -28,29 +31,44 @@ router.post('/createuser', [
     }
 
     try {
-        const checkMultipleUsers = await UserSchema.findOne({ email: req.body.email });
-        if (checkMultipleUsers) {
+        // const checkMultipleUsers = await UserSchema.findOne({ email: req.body.email });
+        const checkMultipleUsers = await pool.query("SELECT * FROM users WHERE email_id = $1", [
+            req.body.email
+        ]);
+        if (checkMultipleUsers.rowCount !== 0) {
             return res.status(403).json({ error: "A User with this email address already exists" });
         }
+
+        // res.status(200).json(checkMultipleUsers);
         
         var salt = await bcrypt.genSalt(10);
         var hash = await bcrypt.hash(req.body.password, salt);
-        const newUser = await UserSchema.create({
-            fname: req.body.fname,
-            lname: req.body.lname,
-            email: req.body.email,
-            password: hash,
-            imageURI: `https://ui-avatars.com/api/?name=${req.body.fname}+${req.body.lname}&background=random`,
-        });
+        // const newUser = await UserSchema.create({
+        //     fname: req.body.fname,
+        //     lname: req.body.lname,
+        //     email: req.body.email,
+        //     password: hash,
+        //     imageURI: `https://ui-avatars.com/api/?name=${req.body.fname}+${req.body.lname}&background=random`,
+        // });
+
+        const newUser = await pool.query("INSERT INTO users(fname, lname, email_id, password, imageuri) VALUES ($1, $2, $3, $4, $5) RETURNING *", [req.body.fname, req.body.lname, req.body.email, hash, `https://ui-avatars.com/api/?name=${req.body.fname}+${req.body.lname}&background=random`]);
 
         let payload = {
             user: {
-                id: newUser.id
+                id: newUser.rows[0].id
             }
         }
-
         const authtoken = jwt.sign(payload, JWT_SECRET);
-        res.json({authtoken});
+        res.status(200).json({ authtoken });
+
+        // let payload = {
+        //     user: {
+        //         id: newUser.id
+        //     }
+        // }
+
+        // const authtoken = jwt.sign(payload, JWT_SECRET);
+        // res.json({authtoken});
 
     } catch (error) {
         console.error(error);
@@ -83,14 +101,18 @@ router.post('/login', [
 
 
     try {
-        const theUser = await UserSchema.findOne({ email: req.body.email });
-        if (theUser) {
+        // const theUser = await UserSchema.findOne({ email: req.body.email });
+        const theUser = await pool.query("SELECT * FROM users WHERE email_id = $1", [
+            req.body.email
+        ]);
+        // console.log(theUser);
+        if (theUser.rowCount === 1) {
             // console.log(checkEmailExists);
-            let checkHash = await bcrypt.compare(req.body.password, theUser.password);
+            let checkHash = await bcrypt.compare(req.body.password, theUser.rows[0].password);
             if (checkHash) {
                 let payload = {
                     user: {
-                        id: theUser.id
+                        id: theUser.rows[0].id
                     }
                 }
                 const authtoken = jwt.sign(payload, JWT_SECRET);
@@ -218,31 +240,70 @@ router.post('/uploadproject', fetchuser, async (req, res) => {
 
 
     try {
-        const theUser = await UserSchema.findById(req.user.id);
+        // const theUser = await UserSchema.findById(req.user.id);
+        const theUser = await pool.query("SELECT * FROM users WHERE id = $1", [
+            req.user.id
+        ]);
 
         const { name, description, langArr, repoName, repoLink, level, image } = req.body;
 
-        const result = await cloudinary.uploader.upload(image, {
-            folder: "devcodelocal/banners",
-            // width: 300,
-            // crop: "scale"
-        });
-        console.log(name);
+        // const result = await cloudinary.uploader.upload(image, {
+        //     folder: "devcodelocal/banners",
+        //     // width: 300,
+        //     // crop: "scale"
+        // });
+        // console.log(name);
 
-        const product = await ProjectSchema.create({
-            userId: theUser.id,
-            name,
-            description,
-            languages: langArr,
-            repoName,
-            repoLink,
-            image: {
-                public_id: result.public_id,
-                url: result.secure_url
-            },
-            level
+        // const product = await ProjectSchema.create({
+        //     userId: theUser.id,
+        //     name,
+        //     description,
+        //     languages: langArr,
+        //     repoName,
+        //     repoLink,
+        //     image: {
+        //         public_id: result.public_id,
+        //         url: result.secure_url
+        //     },
+        //     level
+        // });
+
+        const linodeAccessKeyId = process.env.LINODE_ACCESS_KEY_ID;
+        const linodeSecretAccessKey = process.env.LINODE_SECRET_ACCESS_KEY;
+
+        const s3 = new AWS.S3({
+            accessKeyId: linodeAccessKeyId,
+            secretAccessKey: linodeSecretAccessKey,
+            endpoint: 'ap-south-1.linodeobjects.com',
+            s3ForcePathStyle: true,
+            signatureVersion: 'v4',
         });
-        res.status(201).json({ success: true, product });
+
+        // const image1 = await fs.promises.readFile('w.png');
+        // console.log(image1);
+
+
+        const binaryData = Buffer.from(image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
+
+        s3.upload({
+            Bucket: 'devcodedb',
+            Key: `${uuidv4()}.png`,
+            Body: binaryData,
+            ACL: 'public-read',
+            ContentType: 'image/png'
+        }).promise()
+        .then(async (data) => {
+
+            const product = await pool.query("INSERT INTO projects(user_id, name, description, languages, reponame, repolink, level, image_url, click, likedby) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *", [theUser.rows[0].id, name, description, langArr, repoName, repoLink, level, data.Location, 0, []]);
+
+            console.log(product);
+            res.status(200).json({ success: true, product: product.rows[0] });
+        })
+        .catch(error => {
+            console.error(error);
+        });
+
+        // res.status(201).json({ success: true, product });
 
 
     } catch (error) {

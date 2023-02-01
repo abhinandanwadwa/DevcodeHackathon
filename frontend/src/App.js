@@ -25,9 +25,9 @@ function App() {
   return (
     <BrowserRouter>
       <AuthorizerProvider config={{
-        authorizerURL: 'https://authorizer-production-cd0f.up.railway.app',
+        authorizerURL: 'https://authorizer-production-68f0.up.railway.app',
         redirectURL: window.location.origin,
-        clientID: 'AUTHORIZER_CLIENT_ID'
+        clientID: 'ab2aadb4-b1a9-4b71-9deb-e90f2f2b4bf9'
       }}>
         <Routes>
           <Route path="/" element={<Home />} />
