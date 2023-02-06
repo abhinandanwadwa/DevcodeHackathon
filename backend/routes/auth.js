@@ -286,7 +286,7 @@ router.post('/uploadproject', fetchuser, async (req, res) => {
         const binaryData = Buffer.from(image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
 
         s3.upload({
-            Bucket: 'devcodedb',
+            Bucket: 'newhackathon',
             Key: `${uuidv4()}.png`,
             Body: binaryData,
             ACL: 'public-read',
@@ -327,10 +327,10 @@ router.post('/uploadproject', fetchuser, async (req, res) => {
 // Route 4: Get All Projects: GET: http://localhost:8181/api/auth/getprojects. Login Required
 router.get('/getprojects', async (req, res) => {
     try {
-        // const allProjects = await ProjectSchema.find({ userId: { $ne: req.user.id } });
-        const allProjects = await ProjectSchema.find().sort({ createdAt: 'asc' });
+        // const allProjects = await ProjectSchema.find().sort({ createdAt: 'asc' });
+        const allProjects = await pool.query("SELECT * FROM projects");
         // console.log(req.user.id);
-        res.json(allProjects);
+        res.json(allProjects.rows);
 
 
     } catch (error) {
@@ -402,9 +402,12 @@ router.get('/getmyprojects', fetchuser, async (req, res) => {
 
 
     try {
-        const allProjects = await ProjectSchema.find({ userId: req.user.id });
+        // const allProjects = await ProjectSchema.find({ userId: req.user.id });
+        const allProjects = await pool.query("SELECT * FROM projects WHERE user_id = $1", [
+            req.user.id
+        ]);
         // console.log(req.user.id);
-        res.json(allProjects);
+        res.json(allProjects.rows);
 
 
     } catch (error) {
@@ -435,9 +438,16 @@ router.post('/increaseclick', fetchuser, async (req, res) => {
 
 
     try {
-        const proj = await ProjectSchema.findById(req.body.projectId);
-        const currentCount = proj.click;
-        const theProject = await ProjectSchema.findByIdAndUpdate(req.body.projectId, { click: currentCount+1 });
+        // const proj = await ProjectSchema.findById(req.body.projectId);
+        const proj = await pool.query("SELECT * FROM projects WHERE id = $1", [
+            req.body.projectId
+        ]);
+        const currentCount = proj.rows[0].click;
+        // const theProject = await ProjectSchema.findByIdAndUpdate(req.body.projectId, { click: currentCount+1 });
+        const updateQuery = await pool.query("UPDATE projects SET click = $1 WHERE id = $2", [
+            parseInt(currentCount) + 1,
+            req.body.projectId
+        ]);
 
         res.json({ success: "Success!" });
 
@@ -469,10 +479,13 @@ router.get('/countclicks', fetchuser, async (req, res) => {
 
 
     try {
-        const allProjects = await ProjectSchema.find({ userId: req.user.id });
+        // const allProjects = await ProjectSchema.find({ userId: req.user.id });
+        const allProjects = await pool.query("SELECT * FROM projects WHERE user_id = $1", [
+            req.user.id
+        ]);
         let count = 0;
-        allProjects.forEach(project => {
-            count += project.click;
+        allProjects.rows.forEach(project => {
+            count += parseInt(project.click);
         });
 
         res.json({ clicks: count });
@@ -505,8 +518,11 @@ router.get('/getuser', fetchuser, async (req, res) => {
 
 
     try {
-        const theUser = await UserSchema.findById(req.user.id).select('-password');
-        res.status(200).json(theUser);
+        // const theUser = await UserSchema.findById(req.user.id).select('-password');
+        const theUser = await pool.query("SELECT * FROM users WHERE id = $1", [
+            req.user.id
+        ]);
+        res.status(200).json(theUser.rows[0]);
 
 
     } catch (error) {

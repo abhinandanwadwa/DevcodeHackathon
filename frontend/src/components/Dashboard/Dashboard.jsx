@@ -77,10 +77,10 @@ const Dashboard = () => {
                     <div className="flex flex-col w-full">
                         {projectsList.map((project) => {
                             return (
-                                <div key={project._id} className="mt-10">
+                                <div key={project.id} className="mt-10">
                                     <a href="#" className="flex flex-col items-center border rounded-lg shadow-md md:flex-row w-full border-gray-700 bg-gray-800 hover:bg-gray-700 md:justify-between">
                                         <div className='md:flex'>
-                                            <img className="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" src={project.image.url} alt="" />
+                                            <img className="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" src={project.image_url} alt="" />
                                             <div className="flex flex-col justify-between p-4 leading-normal">
                                                 <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">{project.name}</h5>
                                                 <p className="mb-3 font-normal text-gray-400">{project.description}</p>
@@ -88,7 +88,7 @@ const Dashboard = () => {
                                         </div>
                                         <hr className='md:w-0 w-[100%] opacity-25' />
                                         <div className="flex text-white md:mr-10 my-4">
-                                            <AiFillHeart className='text-pink-500 mr-2 text-2xl' /> <p className='font-bold'>{project.likedBy.length}</p>
+                                            <AiFillHeart className='text-pink-500 mr-2 text-2xl' /> <p className='font-bold'>{project.likedby.length}</p>
                                         </div>
                                     </a>
                                 </div>
