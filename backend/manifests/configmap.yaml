@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: backend-configmap
-data:
-  PSQL_HOST: lin-15897-5147-pgsql-primary.servers.linodedb.net
-  PSQL_USER: linpostgres
-  PSQL_DB: devcode
-  PSQL_PORT: "5432"
