@@ -328,7 +328,7 @@ router.post('/uploadproject', fetchuser, async (req, res) => {
 router.get('/getprojects', async (req, res) => {
     try {
         // const allProjects = await ProjectSchema.find().sort({ createdAt: 'asc' });
-        const allProjects = await pool.query("SELECT * FROM projects");
+        const allProjects = await pool.query("SELECT * FROM projects ORDER BY id ASC");
         // console.log(req.user.id);
         res.json(allProjects.rows);
 

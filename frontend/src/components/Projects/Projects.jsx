@@ -122,6 +122,7 @@ const Projects = () => {
       }
 
       const likeClicked = async (projectId) => {
+        console.log(projectId);
         const authtoken = localStorage.getItem('auth-token');
         if (!authtoken) {
           toast.error("You need to login to like a project!!");

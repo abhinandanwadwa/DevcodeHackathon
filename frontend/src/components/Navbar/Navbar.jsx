@@ -29,7 +29,8 @@ const Navbar = (props) => {
         navigate('/user/new');
       }
       // console.log(json);
-      setImageURI(json.imageURI);
+      console.log(json);
+      setImageURI(json.imageuri);
     }
 
     useEffect(() => {
