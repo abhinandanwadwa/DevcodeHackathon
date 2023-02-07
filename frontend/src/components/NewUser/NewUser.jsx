@@ -12,7 +12,7 @@ const NewUser = () => {
 
     const getUserDetails = async () => {
         const authtoken = localStorage.getItem('auth-token');
-        const response = await fetch('http://localhost:8181/api/auth/getuser', {
+        const response = await fetch('http://170.187.249.125:30001/api/auth/getuser', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ const NewUser = () => {
     const submitForm = async (e) => {
         e.preventDefault();
         const authtoken = localStorage.getItem('auth-token');
-        const response = await fetch('http://localhost:8181/api/auth/github/update', {
+        const response = await fetch('http://170.187.249.125:30001/api/auth/github/update', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

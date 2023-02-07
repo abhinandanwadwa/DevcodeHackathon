@@ -19,7 +19,7 @@ const Projects = () => {
     const [myDetails, setMyDetails] = useState([]);
 
     const getProjects = async () => {
-        const response = await fetch('http://localhost:8181/api/auth/getprojects', {
+        const response = await fetch('http://170.187.249.125:30001/api/auth/getprojects', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -33,7 +33,7 @@ const Projects = () => {
 
     const getMyDetails = async () => {
       const authtoken = localStorage.getItem('auth-token');
-      const response = await fetch('http://localhost:8181/api/auth/getuser' ,{
+      const response = await fetch('http://170.187.249.125:30001/api/auth/getuser' ,{
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ const Projects = () => {
 
     const collaborateClick = async (id, link) => {
         const authtoken = localStorage.getItem('auth-token');
-        const response = await fetch('http://localhost:8181/api/auth/increaseclick', {
+        const response = await fetch('http://170.187.249.125:30001/api/auth/increaseclick', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -128,7 +128,7 @@ const Projects = () => {
           toast.error("You need to login to like a project!!");
         }
         else {
-          const response = await fetch('http://localhost:8181/api/project/likeproject', {
+          const response = await fetch('http://170.187.249.125:30001/api/project/likeproject', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

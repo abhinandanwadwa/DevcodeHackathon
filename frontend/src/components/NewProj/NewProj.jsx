@@ -91,7 +91,7 @@ const NewProj = () => {
     }
     else {
       const authtoken = localStorage.getItem('auth-token');
-      const response = await fetch('http://localhost:8181/api/auth/uploadproject', {
+      const response = await fetch('http://170.187.249.125:30001/api/auth/uploadproject', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

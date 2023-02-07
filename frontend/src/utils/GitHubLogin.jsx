@@ -14,7 +14,7 @@ const GitHubLogin = () => {
 
 
     const loginOrSignup = async () => {
-        const response = await fetch('http://localhost:8181/api/auth/github', {
+        const response = await fetch('http://170.187.249.125:30001/api/auth/github', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
