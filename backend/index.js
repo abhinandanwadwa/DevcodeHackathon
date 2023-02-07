@@ -14,7 +14,7 @@ app.use(express.json({
 
 // Routes
 app.get('/', (req, res) => {
-    res.send(`Hi there! ${process.env.JWT_SECRET}`);
+    res.send('Hi!');
 });
 
 app.use('/api/auth', require('./routes/auth'));
