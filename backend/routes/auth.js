@@ -286,7 +286,7 @@ router.post('/uploadproject', fetchuser, async (req, res) => {
         const binaryData = Buffer.from(image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
 
         s3.upload({
-            Bucket: 'newhackathon',
+            Bucket: 'devcodehack',
             Key: `${uuidv4()}.png`,
             Body: binaryData,
             ACL: 'public-read',

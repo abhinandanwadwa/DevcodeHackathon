@@ -96,16 +96,16 @@ const Projects = () => {
         else {
           setCurrentlyActive(id);
           if (id === 1) {
-            setFilteredProjectLists(projectList.filter(project => project.level === 1));
+            setFilteredProjectLists(projectList.filter(project => parseInt(project.level) === 1));
           }
           else if (id === 2) {
-            setFilteredProjectLists(projectList.filter(project => project.level === 2));
+            setFilteredProjectLists(projectList.filter(project => parseInt(project.level) === 2));
           }
           else if (id === 3) {
-            setFilteredProjectLists(projectList.filter(project => project.level === 3));
+            setFilteredProjectLists(projectList.filter(project => parseInt(project.level) === 3));
           }
           else if (id === 4) {
-            setFilteredProjectLists(projectList.filter(project => project.level === 4));
+            setFilteredProjectLists(projectList.filter(project => parseInt(project.level) === 4));
           }
         }
       }
@@ -205,15 +205,15 @@ const Projects = () => {
                 {filteredProjectLists.map((project) => {
                     return (
                         <div key={project.id} className="relative overflow-hidden shadow-lg bg-[#262626] p-0 rounded-xl">
-                            {project.level === 1 && <span class="absolute font-extrabold bg-green-100 text-green-800 text-lg mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900 z-20">Beginner</span>}
-                            {project.level === 2 && <span class="absolute font-extrabold bg-yellow-100 text-yellow-800 text-lg mr-2 px-2.5 py-0.5 rounded dark:bg-yellow-200 dark:text-yellow-900 z-20">Intermediate</span>}
-                            {project.level === 3 && <span class="absolute font-extrabold bg-purple-100 text-purple-800 text-lg mr-2 px-2.5 py-0.5 rounded dark:bg-purple-200 dark:text-purple-900 z-20">Advance</span>}
-                            {project.level === 4 && <span class="absolute font-extrabold bg-red-100 text-red-800 text-lg mr-2 px-2.5 py-0.5 rounded dark:bg-red-200 dark:text-red-900 z-20">Expert</span>}
+                            {parseInt(project.level) === 1 && <span class="absolute font-extrabold bg-green-100 text-green-800 text-lg mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900 z-20">Beginner</span>}
+                            {parseInt(project.level) === 2 && <span class="absolute font-extrabold bg-yellow-100 text-yellow-800 text-lg mr-2 px-2.5 py-0.5 rounded dark:bg-yellow-200 dark:text-yellow-900 z-20">Intermediate</span>}
+                            {parseInt(project.level) === 3 && <span class="absolute font-extrabold bg-purple-100 text-purple-800 text-lg mr-2 px-2.5 py-0.5 rounded dark:bg-purple-200 dark:text-purple-900 z-20">Advance</span>}
+                            {parseInt(project.level) === 4 && <span class="absolute font-extrabold bg-red-100 text-red-800 text-lg mr-2 px-2.5 py-0.5 rounded dark:bg-red-200 dark:text-red-900 z-20">Expert</span>}
                             <div onMouseLeave={() => mouseLeaveHandlerImage(project.id)} onMouseEnter={() => mouseEnterHandlerImage(project.id)} className="relative flex">
                               <img id={`image-hover-${project.id}`} className="w-full cursor-pointer transition-all" src={project.image_url} alt="Mountain" />
                               <div className="absolute top-0 left-0 hover:z-30 w-full h-full flex flex-row justify-center cursor-pointer items-center opacity-0 hover:opacity-100 text-white ">
                               <button class="text-pink-500 background-transparent font-bold uppercase px-8 py-3 outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 flex space-x-10 flex-row justify-center items-center border border-pink-500 rounded-full hover:bg-gray-500 hover:bg-opacity-30" type="button" onClick={() => likeClicked(project.id)}>
-                                {project.likedby.includes(myDetails.id) ? 
+                                {project.likedby.includes(myDetails.id ? (myDetails.id.toString()) : '') ? 
                                 <>
                                 <AiFillHeart style={{ fontSize: '30px' }} /> &nbsp;&nbsp; {project.likedby.length} {project.likedby.length === 1 ? 'Like' : 'Likes'}
                                 </>
