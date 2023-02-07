@@ -45,9 +45,9 @@ const Navbar = (props) => {
     
     const navigation = [
         { name: 'Home', href: '/', current: (props.focus === "home") },
-        { name: 'Features', href: '/#features', current: false },
+        { name: 'Features', href: '/', current: false },
         { name: 'Projects', href: '/projects', current: (props.focus === "projects") },
-        { name: 'Github', href: 'https://github.com/dvstechlabs/devcode', current: false },
+        // { name: 'Github', href: 'https://github.com/dvstechlabs/devcode', current: false },
       ]
       
       function classNames(...classes) {
@@ -94,8 +94,9 @@ const Navbar = (props) => {
                 <div className="hidden sm:ml-6 sm:block">
                   <div className="flex space-x-4">
                     {navigation.map((item) => (
-                      <a
+                      <Link
                         key={item.name}
+                        to={item.href}
                         href={item.href}
                         className={classNames(
                           item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
@@ -104,8 +105,11 @@ const Navbar = (props) => {
                         aria-current={item.current ? 'page' : undefined}
                       >
                         {item.name}
-                      </a>
+                      </Link>
                     ))}
+                    <a className={classNames('text-gray-300 hover:bg-gray-700 hover:text-white',
+                          'px-3 py-2 rounded-md text-sm font-medium'
+                        )} href='https://github.com/dvstechlabs/devcode'>GitHub</a>
                   </div>
                 </div>
               </div>
@@ -144,22 +148,22 @@ const Navbar = (props) => {
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       <Menu.Item>
                         {({ active }) => (
-                          <a
-                            href="/dashboard"
+                          <Link
+                            to={'/dashboard'}
                             className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                           >
                             Dashboard
-                          </a>
+                          </Link>
                         )}
                       </Menu.Item>
                       <Menu.Item>
                         {({ active }) => (
-                          <a
-                            href="/newproject"
+                          <Link
+                            to={'/newproject'}
                             className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                           >
                             New Project
-                          </a>
+                          </Link>
                         )}
                       </Menu.Item>
                       <Menu.Item>
