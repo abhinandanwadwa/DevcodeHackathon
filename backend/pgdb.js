@@ -1,9 +1,9 @@
 const Pool = require('pg').Pool;
 
 const pool = new Pool({
-    user: "postgres",
+    user: "linpostgres",
     password: process.env.pgPassword,
-    host: 'localhost',
+    host: 'lin-15897-5147-pgsql-primary.servers.linodedb.net',
     port: 5432,
     database: "devcode"
 });
