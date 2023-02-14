@@ -56,8 +56,8 @@ const Navbar = (props) => {
 
       const signout = () => {
         localStorage.removeItem('auth-token');
-        window.location.href = "http://localhost:3000";
-        window.location.replace("http://localhost:3000");
+        window.location.href = "http://linodecode.stonecss.com/";
+        window.location.replace("http://linodecode.stonecss.com/");
       }
       
   return (
