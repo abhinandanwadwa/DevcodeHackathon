@@ -1,81 +1,121 @@
-# DEVCODE
+# LinodeCode
 
-## Grow, Share And Connect With Developers
+## Your Privacy Friendly, Open Source. Alternative to EverNote.
 
-![logo](images/devcode.png)
+![Logo](images/devcode.png)
 
-### Visit : <a href="https://devcode.stonecss.com">devcode.stonecss.com</a>
+![Banner](images/banner.png)
 
-Using v0.5.5-beta ( Latest Beta v0.5.5-beta Latest Stable v0.5.0 )
-
-**Made with ❤ By ByteMakers**
-
-Please give this repo a ⭐ it really helps us!
-
-Our System Statuspage is Available At <a href="https://dvstechlabs.statuspage.io" target="_blank">dvstechlabs.statuspage.io</a>
-
-![Border](images/border.png)
-
-## Team
-
-The Developer Team behind Devcode. This project wouldn't have been possible without them and our awesome contributors.
-
-- [@devarshishimpi](https://www.github.com/devarshishimpi) [ Owner, Developer Team, Support Team ]
-- [@abhinandanwadwa](https://github.com/abhinandanwadwa) [ Owner, Developer Team, Support Team ]
-
-## Contributing
-
-![Border](images/border.png)
-
-Contributions are always welcome!
-
-See [`contributing.md`](./CONTRIBUTING.md) for ways to get started.
-
-Please adhere to this project's [`Code of Conduct`](./CODE_OF_CONDUCT.md).
+Visit At <a href="https://linodecode.stonecss.com" target="_blank">linodecode.stonecss.com</a>
 
 ## Deployment
 
-![Border](images/border.png)
-
-Make Sure You Have MongoDB and NodeJS Installed.
-
 ### Deploying Backend
 
-To deploy this project navigate to the backend folder and run
+To deploy the backend. Create a new Kubernetes Cluster on Linode along with a Managed Postgres Database and Linode Object Storage. Then run the following commands. Ensure you have `kubectl` installed.
+
+Make a new folder called `manifests` and run the following commands.
 
 ```bash
-  cd backend
+mkdir manifests
 ```
 
 ```bash
-  npm install
+cd manifests
 ```
+
+Make a new file named `devcode-deployment.yaml`, inside it and paste the following content in it.
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devcode
+  labels:
+    app: devcode
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: devcode
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 4
+  template:
+    metadata:
+      labels:
+        app: devcode
+    spec:
+      containers:
+        - name: devcode
+          image: abhinandan1311/devcodeproduction:final
+          ports:
+            - containerPort: 8181
+          env:
+            - name: JWT_SECRET
+              value: "JWT_SECRET"
+            - name: pgPassword
+              value: "POSTGRES_PASSWORD"
+            - name: LINODE_ACCESS_KEY_ID
+              value: "OBJECT_STORAGE_ACCESS_ID"
+            - name: LINODE_SECRET_ACCESS_KEY
+              value: "OBJECT_STORAGE_SECRET_KEY"
+```
+
+Make another file called `node_service.yaml` and paste the following content in it.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: devcode-service-node
+  labels:
+    app: devcode
+spec:
+  selector:
+    app: devcode
+  type: NodePort
+  ports:
+  - name: http
+    port: 8181
+    targetPort: 8181
+    nodePort: 30001
+```
+
+Make another file called `service.yaml` and paste the following content in it.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: devcode-service
+  labels:
+    app: devcode
+spec:
+  selector:
+    app: devcode
+  type: ClusterIP
+  ports:
+    - port: 8181
+      targetPort: 8181
+      protocol: TCP
+```
+
+Run the following commands.
 
 ```bash
-  node index.js
+kubectl apply ./ --kubeconfig {your_kubeconfig_file_location}
 ```
 
-or
-
-```bash
-  nodemon
-```
-
-Create a `.env` file in the backend folder and add the following
-
-```bash
-JWT_SECRET = "RANDOMSTRINGMUSTNOTCHANGE"
-mongoURI = "MONGO_URI"
-CLOUD_NAME = "YOUR_CLOUD_NAME"
-CLOUD_KEY = "YOUR_API_KEY"
-CLOUD_KEY_SECRET = "YOUR_CLOUD_KEY_SECRET"
-```
 
 ### Deploying Frontend
 
-![Border](images/border.png)
+To deploy the frontend. Make a new Linux Linode. Install Nginx and NodeJS. Then run the following commands.
 
-To deploy this project navigate to the frontend folder and run
+```bash
+  git clone https://github.com/abhinandanwadwa/DevcodeHackathon.git
+```
 
 ```bash
   cd frontend
@@ -86,22 +126,38 @@ To deploy this project navigate to the frontend folder and run
 ```
 
 ```bash
-  npm start
+  npm run build
 ```
 
-Navigate to `http://localhost:3000/`
+```bash
+  sudo cp -rf build /var/www/html
+```
 
+```bash
+  sudo vim /etc/nginx/sites-available/default
+```
 
-## Stargazers
+Edit the file and change the following section to this
 
-![Border](images/border.png)
+```
+    server {
+            listen 80 default_server;
+            listen [::]:80 default_server;
 
-Our awesome stargazers! Thank you for your support!
+            root /var/www/html/build;
 
-[![Stargazers repo roster for @dvstechlabs/Devcode](https://reporoster.com/stars/dvstechlabs/Devcode)](https://github.com/dvstechlabs/Devcode/stargazers)
+            index index.html index.htm index.nginx-debian.html;
 
-## Feedback
+            server_name _;
 
-![Border](images/border.png)
+            location / {
+                    try_files $uri $uri/ /index.html;
+            }
+    }
+```
 
-If you have any feedback, please reach out to us at devarshishimpi@gmail.com
+```bash
+  sudo service nginx restart
+```
+
+Navigate to `http://youripaddress`
