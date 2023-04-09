@@ -1,6 +1,6 @@
 # LinodeCode
 
-## Your Privacy Friendly, Open Source. Alternative to EverNote.
+## Grow, Share And Connect With Developers
 
 ![Logo](images/devcode.png)
 
